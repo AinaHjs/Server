@@ -13,9 +13,13 @@ const PORT = process.env.PORT || 8080;
 // Create function that serves file
 const serveFile = async (filePath,contentType,response,statusCode) => {
     try {
-        const data = await fsPromises.readFile(filePath, 'utf8');
+        const data = await fsPromises.readFile(filePath, !contentType.includes('image') ?'utf8':'');
+
+        const parsedData = contentType === 'application/json' ? JSON.parse(data) : data ;
         response.writeHead(statusCode, {'Content-type': contentType});
-        response.end(data);
+        response.end(
+            contentType === 'application/json' ? JSON.stringify(parsedData) : data
+        );
     } catch (err) {
         console.log("Error: ", err.message);
         response.statusCode(500);
